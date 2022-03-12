@@ -17,6 +17,7 @@
 
 <body>
     <!-- NavBar -->
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark position-static">
         <div class="container">
             <a class="navbar-brand" href="#">ImDamian</a>
@@ -48,8 +49,9 @@
     <section class="container-fluid row">
         <!-- PDF -->
         <div class="col-12 col-sm-8 col-lg-6 mx-auto">
-            <embed src="https://docs.google.com/viewer?srcid=1ktcHMcHdkqo5wGKiHK9owy6iRc0aUe86&pid=explorer&efh=false&a=v&chrome=false&embedded=true" type="application/pdf"
-                class="w-100 d-block mx-auto my-3 ">
+            <embed
+                src="https://docs.google.com/viewer?srcid=1ktcHMcHdkqo5wGKiHK9owy6iRc0aUe86&pid=explorer&efh=false&a=v&chrome=false&embedded=true"
+                type="application/pdf" class="w-100 d-block mx-auto my-3 ">
         </div>
         <!-- body -->
         <div class="col-lg-6">
@@ -75,6 +77,17 @@
                             <pre><code>CREATE DATABASE negocio;</code></pre>
                             <p class="sql-coment">-- accediendo a la base de datos</p>
                             <pre><code>\c negocio</code></pre>
+                            <p class="sql-coment">-- como segundo paso se carga el respaldo de la base correspondeinte
+                                desde archivo unidad2.sql</p>
+                            <pre><code>psql -U postgres negocio < unidad2.sql</code></pre>
+                            <p class="sql-error">-- Error al cargar los datos</p>
+                            <p class="sql-coment">-- debido a que no funciona se propone una nueva forma de acceder a la
+                                DB</p>
+                            <pre><code>C:\Program Files\PostgreSQL\14\bin>psql -U postgres -p 5432 -d nombreDB DirectorioDB\archivo.sql</code></pre>
+                            <p class="sql-coment">-- con esto se logra cargar la DB unidad2.sql desde el archivo</p>
+                            <pre><code>\dt</code></pre>
+                            <img src="assets/img/lista_de_relaciones.PNG" alt="">
+
                         </div>
                     </div>
                 </div>
@@ -100,13 +113,9 @@
                                 requerimiento y luego consulta la tabla producto para validar si fue efectivamente
                                 descontado en el stock.
                             </p>
-
-                            <p class="sql-coment">-- creando base de datos</p>
-                            <pre><code>CREATE TABLE usuario(<br class="br-code"> id INT,<br> email VARCHAR(50),<br> PRIMARY KEY (id));</code></pre>
-                            <p class="sql-coment">-- create table post</p>
-                            <pre><code>CREATE TABLE post(<br> id INT,usuario_id INT,<br> titulo VARCHAR(100),<br> fecha DATE,<br> PRIMARY KEY (id),<br> FOREIGN KEY (usuario_id) REFERENCES usuario(id));</code></pre>
-                            <p class="sql-coment">-- create table comentario</p>
-                            <pre><code>CREATE TABLE comentario(<br> id INT,<br> usuario_id INT,<br> post_id INT,<br> texto VARCHAR(100),<br> fecha DATE,<br> PRIMARY KEY (id),<br> FOREIGN KEY (post_id) REFERENCES post(id),<br> FOREIGN KEY (usuario_id) REFERENCES usuario(id));</code></pre>
+                            <pre><code><p class="sql-coment">--como primer paso para iniciar una transaccion</p><p class="sql-coment">--apagar AUTOCOMMIT</p>\set AUTOCOMMIT off<p class="sql-coment">--verificar AUTOCOMMIT</p>\echo :AUTOCOMMIT</code></pre>
+                            <pre><code><p class="sql-coment">--luego realizar la transaccion</p>BEGIN TRANSACTION;<br><br><p class="sql-coment">-- insertando la compra</p>INSERT INTO compra(id, cliente_id, fecha)<br>VALUES(33, 1, '2022-03-08');<br><br><p class="sql-coment">-- insertando el detalle de la compra realizada</p>INSERT INTO detalle_compra(id, producto_id, compra_id, cantidad)<br>VALUES(43,9,33,5);<br><br><p class="sql-coment">-- actualizacion del stock</p>UPDATE producto SET stock = stock -5 where id = 9;<br><br><p class="sql-coment">-- validacion del stock</p>SELECT * FROM producto WHERE id=9;<br>SELECT * FROM detalle_compra WHERE id = 43;<br><br>COMMIT;</code></pre>
+                            <img src="assets/img/item2_validacion.PNG" alt="">
                         </div>
                     </div>
                 </div>
@@ -132,19 +141,24 @@
                                 requerimiento y luego consulta la tabla producto para validar que si alguno de ellos se
                                 queda sin stock, no se realice la compra.
                             </p>
-                            <p class="sql-coment">-- importar registros usuario</p>
-                            <pre><code>COPY usuario<br> FROM 'directorio\assets\registros\usuario.csv' csv header;</code></pre>
-                            <p class="sql-coment">-- importar registros post</p>
-                            <pre><code>COPY usuario<br> FROM 'directorio\assets\registros\post.csv' csv header;</code></pre>
-                            <p class="sql-coment">-- importar registros comentario</p>
-                            <pre><code>COPY usuario<br> FROM 'directorio\assets\registros\comentario.csv' csv header;</code></pre>
-                            <h2 class="mt-5 text-success">Verificar las tablas.</h2>
-                            <p class="sql-coment">-- vefificar usuario</p>
-                            <img src="assets/img/tabla_usuario.PNG" alt="">
-                            <p class="sql-coment">-- vefificar post</p>
-                            <img src="assets/img/tabla_post.PNG" alt="">
-                            <p class="sql-coment">-- vefificar comentario</p>
-                            <img src="assets/img/tabla_comentario.PNG" alt="">
+                            <pre><code><p class="sql-coment">-- inicia la transaccion</p>BEGIN TRANSACTION;<br><br><p class="sql-coment">-- se inserta la compra</p>INSERT INTO compra(id, cliente_id, fecha)<br>VALUES(34, 2, '2022-03-08');
+                                    <p class="sql-coment">-- se inserta el detalle de la compra producto 1</p>INSERT INTO detalle_compra(id, producto_id,compra_id, cantidad)<br>VALUES(44,1,34,3);<br>UPDATE producto SET stock = stock -3<br>WHERE id = 1;<br>SAVEPOINT detalle_producto1;<br>SELECT * FROM detalle_compra WHERE id=44;<br>SELECT * FROM producto WHERE id=1;<br>
+                                    <p class="sql-coment">-- se inserta el detalle de la compra producto 2</p>INSERT INTO detalle_compra(id, producto_id, compra_id, cantidad)<br>VALUES(45,2,34,3);<br>UPDATE producto SET stock = stock -3<br>WHERE id = 1;<br>SAVEPOINT detalle_producto2;<br>SELECT * FROM detalle_compra WHERE id=45;<br>SELECT * FROM producto WHERE id=2;<br>
+                                    <p class="sql-coment">-- se inserta el detalle de la compra producto 8</p>INSERT INTO detalle_compra(id, producto_id, compra_id, cantidad)<br>VALUES(46,8,34,3);<br>UPDATE producto SET stock = stock -3<br>WHERE id = 1;<br>SAVEPOINT detalle_producto8;<br>SELECT * FROM detalle_compra WHERE id=46;<br>SELECT * FROM producto WHERE id=8;<br><br>ROLLBACK TO detalle_producto2;<br><br><p class="sql-coment">-- termino de la transaccion</p>COMMIT;</code></pre>
+                            <p class="sql-coment">-- se realiza la transaccion mostrando detalle de la compra y compra
+                                producto 1</p>
+                            <img src="assets/img/3.1.PNG" alt="">
+                            <img src="assets/img/3.2.PNG" alt="">
+                            <p class="sql-coment">-- se realiza la transaccion mostrando detalle de la compra y compra
+                                producto 2</p>
+                            <img src="assets/img/3.3.PNG" alt="">
+                            <img src="assets/img/3.4.PNG" alt="">
+                            <p class="sql-error">-- ERROR: el nuevo registro para la relación «producto» (8) viola la
+                                restricción «check» «stock_valido»</p>
+                            <p class="sql-error">-- ERROR: transacción abortada, las órdenes serán ignoradas hasta el
+                                fin de bloque de transacción</p>
+                            <p class="sql-coment">-- por lo que se ingnoran todas las ordenes posteriores y se ejecuta
+                                el rollback al finalizar la transaccion.</p>
                         </div>
                     </div>
                 </div>
@@ -168,6 +182,7 @@
                                 <li>Confirmar que se restauró la información, sin considerar la inserción del punto b
                                 </li>
                                 <li>Habilitar de nuevo el AUTOCOMMIT</li>
+                                <pre><code>BEGIN TRANSACTION;<br><br><p class="sql-coment">--  Deshabilitar el AUTOCOMMIT</p>\set AUTOCOMMIT off<br>\echo :AUTOCOMMIT<br>SAVEPOINT pre;<br><br><p class="sql-coment">--  Insertar un nuevo cliente</p>INSERT INTO cliente(id, nombre, email)<br>VALUES(11, 'nuevo usuario', 'usuario011@gmail.com');<br><br><p class="sql-coment">--  Confirmar que fue agregado en la tabla cliente</p>SELECT * FROM cliente WHERE id = 11;<br><br><p class="sql-coment">--  Realizar un ROLLBACK</p>ROLLBACK TO pre;<br><br><p class="sql-coment">--  Confirmar que se restauró la información, sin considerar la inserción del punto b</p>SELECT * FROM cliente;<br><br><p class="sql-coment">--  Habilitar de nuevo el AUTOCOMMIT</p>\set AUTOCOMMIT on<br>\echo :AUTOCOMMIT<br><br>COMMIT;</code></pre>
                             </ol>
                         </div>
                     </div>
@@ -176,15 +191,13 @@
         </div>
     </section>
 
-    <!-- Comentario -->
-    <section class="container pt-5">
-        <h5 class="text-info"><strong>Nota: </strong>puntos realizados del 1 al 3.</h5>
-    </section>
-
-
     <!-- Separate Popper and Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+        integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+        integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+        crossorigin="anonymous"></script>
 
     <!--  -->
     <script src="assets/js/main.js"></script>

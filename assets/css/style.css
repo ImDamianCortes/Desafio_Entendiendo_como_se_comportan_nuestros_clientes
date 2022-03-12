@@ -6,23 +6,26 @@ embed {
 }
 
 .sql-coment {
-  color: rgb(0, 168, 0);
+  color: rgb(25, 159, 25);
+  font-weight: 400;
+  margin-bottom: 3px;
+}
+.sql-error {
+  color: red;
   font-weight: 400;
 }
 
 pre {
     display: block;
-    background-color: rgb(186, 186, 186);
+    background-color: rgb(233, 233, 233);
     color: rgb(163, 23, 202);
     font-size: medium;
     font-weight: 500;
     margin: 1em 0px ;
-    padding: 5px 5px 5px 5px;
-    border-radius: 5px;
-}
-
-code {
-    margin-left: 10px;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 7px;
 }
 
 img {
@@ -30,9 +33,6 @@ img {
   max-width: 100%;
 }
 
-p {
-    margin-top: 10px;
-}
 .accordion {
   border: 0px transparent !important;
   background-color: transparent;
@@ -41,4 +41,7 @@ p {
   margin-bottom: 5px;
   border-radius: 3px;
 }
-
+img {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
